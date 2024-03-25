@@ -8,25 +8,29 @@ import wpilib
 import wpilib.drive
 import commands2
 import math
+import navx
+from  wpilib.shuffleboard import *
 
 import constants
 
 
 class DriveSubsystem(commands2.Subsystem):
+
     def __init__(self) -> None:
         """Creates a new DriveSubsystem"""
         super().__init__()
 
         # The motors on the left side of the drive.
+        
+        # phoenix5.VictorSPX(constants.DriveConstants.kLeftMotor1CanID),
+
         self.leftMotors = wpilib.MotorControllerGroup(
-            wpilib.PWMSparkMax(constants.DriveConstants.kLeftMotor1Port),
-            wpilib.PWMSparkMax(constants.DriveConstants.kLeftMotor2Port),
+            wpilib.PWMSparkMax(constants.DriveConstants.kLeftMotorPort),
         )
 
         # The motors on the right side of the drive.
         self.rightMotors = wpilib.MotorControllerGroup(
-            wpilib.PWMSparkMax(constants.DriveConstants.kRightMotor1Port),
-            wpilib.PWMSparkMax(constants.DriveConstants.kRightMotor2Port),
+            wpilib.PWMSparkMax(constants.DriveConstants.kRightMotorPort),
         )
 
         # The robot's drive
@@ -59,9 +63,17 @@ class DriveSubsystem(commands2.Subsystem):
             constants.DriveConstants.kEncoderDistancePerPulse
         )
 
-        self.gyro = wpilib.ADXRS450_Gyro()
+        # self.gyro = wpilib.ADXRS450_Gyro()
+        self.gyro = navx.AHRS.create_spi()
+        self.tab = Shuffleboard.getTab("Drive")
+        self.gyroWidget = self.tab.add("Gyro",0)
 
-    def arcadeDrive(self, fwd: float, rot: float):
+
+    def periodic(self):
+        self.gyroWidget.getEntry().setDouble(self.gyro.getAngle())
+
+
+    def arcadeDrive(self, fwd: float, rot: float)
         """
         Drives the robot using arcade controls.
 

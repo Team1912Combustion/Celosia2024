@@ -6,7 +6,6 @@
 
 import wpilib
 import wpimath.controller
-
 import commands2
 import commands2.cmd
 import commands2.button
@@ -15,7 +14,6 @@ import constants
 import subsystems.drivesubsystem
 import commands.turntoangle
 import commands.turntoangleprofiled
-
 
 class RobotContainer:
     """
@@ -32,7 +30,7 @@ class RobotContainer:
         self.robotDrive = subsystems.drivesubsystem.DriveSubsystem()
 
         # The driver's controller
-        self.driverController = wpilib.PS4Controller(
+        self.driverController = wpilib.XboxController(
             constants.OIConstants.kDriverControllerPort
         )
 
@@ -61,20 +59,20 @@ class RobotContainer:
         """
         # Drive at half speed when the right bumper is held
         commands2.button.JoystickButton(
-            self.driverController, wpilib.PS4Controller.Button.kR1
+            self.driverController, wpilib.XboxController.Button.kRightBumper
         ).onTrue(
             commands2.InstantCommand(
-                (lambda: self.robotDrive.setMaxOutput(0.5)), self.robotDrive
+                (lambda: self.robotDrive.setMaxOutput(0.25)), self.robotDrive
             )
         ).onFalse(
             commands2.InstantCommand(
-                (lambda: self.robotDrive.setMaxOutput(1)), self.robotDrive
+                (lambda: self.robotDrive.setMaxOutput(0.5)), self.robotDrive
             )
         )
 
         # Stabilize robot to drive straight with gyro when left bumper is held
         commands2.button.JoystickButton(
-            self.driverController, wpilib.PS4Controller.Button.kL1
+            self.driverController, wpilib.XboxController.Button.kLeftBumper
         ).whileTrue(
             commands2.PIDCommand(
                 wpimath.controller.PIDController(
@@ -97,12 +95,12 @@ class RobotContainer:
 
         # Turn to 90 degrees when the 'X' button is pressed, with a 5 second timeout
         commands2.button.JoystickButton(
-            self.driverController, wpilib.PS4Controller.Button.kCross
+            self.driverController, wpilib.XboxController.Button.kA
         ).onTrue(commands.turntoangle.TurnToAngle(90, self.robotDrive).withTimeout(5))
 
         # Turn to -90 degrees with a profile when the Circle button is pressed, with a 5 second timeout
         commands2.button.JoystickButton(
-            self.driverController, wpilib.PS4Controller.Button.kCircle
+            self.driverController, wpilib.XboxController.Button.kB
         ).onTrue(
             commands.turntoangleprofiled.TurnToAngleProfiled(
                 -90, self.robotDrive
