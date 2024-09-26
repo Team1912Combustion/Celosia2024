@@ -9,6 +9,3 @@ branch derived from **knockout** with additional auto capabilities
 - supposedly, reading path jsons can be slow? do it at auto init
 - `PathWeaver/pathweaver.json` is our pathweaver config file, dont touch anything that isnt a number
     - paths will not build if numbers are set to 0.0
-
-### limelight
-- TODO: fully transition to websocket
