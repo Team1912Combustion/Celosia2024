@@ -12,8 +12,8 @@ class RamTest(SequentialCommandGroup):
     def __init__(self, drive: DriveSubsystem, sew: SewSubsystem):
         exampleTrajectory = sew.readJson("blueidk2")
         init = exampleTrajectory.initialPose()
-        drive.odometry.resetPosition(drive.gyro.getRotation2d(), 0, 0, init)
         drive.resetEncoders()
+        drive.odometry.resetPosition(drive.sillyGyro.getRot(), 0, 0, init)
 
         self.ram = RamseteCommand(
             exampleTrajectory, drive.getPose2d, drive.ramsete, drive.feedforward,

@@ -6,13 +6,15 @@ from commands.ramtest import RamTest
 import constants
 
 from subsystems.drivesubsystem import DriveSubsystem
-from subsystems.feedersubsystem import FeederSubsystem
 from subsystems.intakesubsystem import IntakeSubsystem
 from subsystems.shootersubsystem import ShooterSubsystem
-from subsystems.ampsubsystem import AmpSubsystem
 from subsystems.opticalsubsystem import OpticalSubsystem
 from subsystems.limesubsystem import LimeSubsystem
 from subsystems.sewsubsystem import SewSubsystem
+
+from subsystems.ampsub import *
+from subsystems.gyrosub import *
+from subsystems.feedsub import *
 
 from wpilib.cameraserver import CameraServer
 
@@ -28,12 +30,12 @@ class RobotContainer:
         """The container for the robot. Contains subsystems, OI devices, and commands."""
         self.optics = OpticalSubsystem()
         self.lime = LimeSubsystem()
-        self.drive = DriveSubsystem(self.optics, self.lime)
-        self.feeder = FeederSubsystem()
+        self.drive = DriveSubsystem(self.optics, self.lime, GyroSub())
+        self.feeder = FeedSub().bind(self.opsController)
         self.intake = IntakeSubsystem()
         self.shooter = ShooterSubsystem()
-        self.amp = AmpSubsystem()
         self.sew = SewSubsystem()
+        self.amp = AmpSub().bind(self.opsController)
 
         CameraServer.launch()
 
@@ -54,10 +56,6 @@ class RobotContainer:
             .onTrue(self.intake.setSpeed(0.5)) \
             .onFalse(self.intake.setSpeed(0.0))
 
-        self.opsController.a() \
-            .onTrue(self.feeder.setSpeed(1.0)) \
-            .onFalse(self.feeder.setSpeed(0.0))
-
         self.opsController.x() \
             .onTrue(self.shooter.setSpeed(1.0)) \
             .onFalse(self.shooter.setSpeed(0.0))
@@ -65,14 +63,6 @@ class RobotContainer:
         self.opsController.y() \
             .onTrue(self.setAll(-0.5)) \
             .onFalse(self.setAll(0.0))
-
-        self.opsController.povDown() \
-            .onTrue(self.amp.setSpeed(-0.1)) \
-            .onFalse(self.amp.setSpeed(0.0))
-
-        self.opsController.povUp() \
-            .onTrue(self.amp.setSpeed(0.33)) \
-            .onFalse(self.amp.setSpeed(0.0))
 
         self.opsController.rightBumper() \
             .onTrue(SequentialCommandGroup(
@@ -86,10 +76,10 @@ class RobotContainer:
         return ParallelCommandGroup(
             self.intake.setSpeed(speed),
             self.feeder.setSpeed(speed),
-            self.shooter.setSpeed(speed))
+            self.shooter.setSpeed(speed),
+            self.amp.setSpeed(speed))
 
     def getAutonomousCommand(self) -> Command:
-        RamTest(self.drive, self.sew)
 
         return SequentialCommandGroup(
             self.shooter.setSpeed(1.0),

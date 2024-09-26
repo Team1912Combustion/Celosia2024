@@ -39,6 +39,8 @@ from wpimath.estimator import DifferentialDrivePoseEstimator
 from subsystems.opticalsubsystem import OpticalSubsystem
 from subsystems.limesubsystem import LimeSubsystem
 
+from subsystems.gyrosub import *
+
 from constants import DriveConstants as Dc, AutoConstants as Ac, OpticalConstants as Oc, LimeConstants as Lc
 from wpilib import RobotController
 
@@ -53,11 +55,12 @@ from wpilib import SmartDashboard
 # 9982 - the intake falls to the front of the robot
 
 class DriveSubsystem(commands2.Subsystem):
-    def __init__(self, opticalSubsystem: OpticalSubsystem, limeSubsystem: LimeSubsystem) -> None:
+    def __init__(self, opticalSubsystem: OpticalSubsystem, limeSubsystem: LimeSubsystem, gyro: GyroSub) -> None:
         super().__init__()
 
         self._eyes = opticalSubsystem
         self._lime = limeSubsystem
+        self.sillyGyro = gyro
 
         self.isRewindTime = False
 
@@ -93,10 +96,7 @@ class DriveSubsystem(commands2.Subsystem):
         self.leftEncoder.reset()
         self.rightEncoder.reset()
 
-        self.gyro = navx.AHRS.create_spi()
-        self.gyro.reset()
-
-        iRot = self.gyro.getRotation2d()
+        iRot = self.sillyGyro.getRot()
         iPose = Pose2d(0, 0, iRot)
 
         self.odometry = DifferentialDrivePoseEstimator(Ac.kDriveKinematics, iRot, 0, 0, iPose)
@@ -123,7 +123,6 @@ class DriveSubsystem(commands2.Subsystem):
         self.idk = Shuffleboard.getTab("drive")
         self.idk2 = self.idk.add("encoderleft", 0)
         self.idk3 = self.idk.add("encoderright", 0)
-        self.idk4 = self.idk.add("gyro", 0)
         self.idk5 = self.idk.add("odometryX",0)
         self.idk6 = self.idk.add("odometryY", 0)
         self.idk7 = self.idk.add("odometryDeg", 0)
@@ -132,7 +131,7 @@ class DriveSubsystem(commands2.Subsystem):
         self.idk10 = self.idk.add("rawlimepose", [0, 0, 0, 0])
 
     def periodic(self):
-        self.odometry.update(self.gyro.getRotation2d(), self.leftEncoder.getDistance(), self.rightEncoder.getDistance())
+        self.odometry.update(self.sillyGyro.getRot(), self.leftEncoder.getDistance(), self.rightEncoder.getDistance())
 
         if self._eyes.bluPose != None:
             pass
@@ -151,7 +150,6 @@ class DriveSubsystem(commands2.Subsystem):
         #print(self._lime.totalLatency)
         self.idk2.getEntry().setInteger(self.leftEncoder.get())
         self.idk3.getEntry().setInteger(self.rightEncoder.get())
-        self.idk4.getEntry().setFloat(self.gyro.getRotation2d().degrees())
         self.idk5.getEntry().setFloat(self.odometry.getEstimatedPosition().X())
         self.idk6.getEntry().setFloat(self.odometry.getEstimatedPosition().Y())
         self.idk7.getEntry().setFloat(self.odometry.getEstimatedPosition().rotation().degrees())
@@ -219,7 +217,7 @@ class DriveSubsystem(commands2.Subsystem):
         """
         Zeroes the heading of the robot.
         """
-        self.gyro.reset()
+        self.sillyGyro.reset()
 
 
     def getPose2d(self) -> wpimath.geometry.Pose2d:
@@ -243,7 +241,7 @@ class DriveSubsystem(commands2.Subsystem):
         #)
 
         # Convert Radian-based heading to degrees
-        return self.gyro.getRotation2d().degrees()
+        return self.sillyGyro.getRot(True)
         
 
     def getTurnRate(self):
@@ -252,7 +250,7 @@ class DriveSubsystem(commands2.Subsystem):
 
         :returns: The turn rate of the robot, in degrees per second
         """
-        return self.gyro.getRate() * (
+        return self.sillyGyro.getRate() * (
             -1 if constants.DriveConstants.kGyroReversed else 1
         )
 

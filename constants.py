@@ -113,7 +113,7 @@ class ControllerConstants:
 class GyroConstants:
     PORT: SPI.Port = SPI.Port.kMXP
     BITRATE: int = 500000
-    UPADTE_RATE: int = 60 # Hz
+    UPDATE_HZ: int = 60 # Hz
     SKEPTICISM: tuple[float, float, float] = (0.02, 0.02, 0.01)
 
 class ShooterConstants: # Spark x2
@@ -162,10 +162,6 @@ class LimeConstants:
 
     NT_NUM_DEFAULT: int = -11991122
     DEFAULT_LATENCY: float = 120.0 # ms
-
-class GyroConstants:
-    BITRATE: int = 500000
-    UPDATE_HZ: int = 60
 
 # roboRIO 2.0
 class RoboRioConstants:
