@@ -110,12 +110,6 @@ class ControllerConstants:
     VELOCITY_GAIN: float = 2.5377 # 9982: 2.1313-2.7174
     ACCELERATION_GAIN: float = 1.1553 # 9982: 1.7129-2.7601
 
-class GyroConstants:
-    PORT: SPI.Port = SPI.Port.kMXP
-    BITRATE: int = 500000
-    UPDATE_HZ: int = 60 # Hz
-    SKEPTICISM: tuple[float, float, float] = (0.02, 0.02, 0.01)
-
 class ShooterConstants: # Spark x2
     SHOOT_SPEED: float = 1.0
     AMP_SPEED: float = 0.3
@@ -170,3 +164,12 @@ class RoboRioConstants:
 
     LOG_FLUSH_PERIOD: float = 0.25
     LOG_NT: bool = True
+
+# navX AHRS
+class GyroConstants:
+    PORT: SPI.Port = SPI.Port.kMXP
+    BITRATE: int = 500000
+    UPDATE_HZ: int = 60
+
+    SKEPTICISM: tuple[float, float, float] = (0.02, 0.02, 0.01)
+    LOG_TO_CONSOLE: bool = False

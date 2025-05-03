@@ -9,8 +9,8 @@ from wpimath.geometry import Translation2d, Rotation2d, Pose2d
 from wpimath.geometry import Rotation2d
 
 class RamTest(SequentialCommandGroup):
-    def __init__(self, drive: DriveSubsystem, sew: SewSubsystem):
-        exampleTrajectory = sew.readJson("blueidk2")
+    def __init__(self, drive: DriveSubsystem, sew: SewSubsystem, name: str):
+        exampleTrajectory = sew.readJson(name)
         init = exampleTrajectory.initialPose()
         drive.resetEncoders()
         drive.odometry.resetPosition(drive.sillyGyro.getRot(), 0, 0, init)

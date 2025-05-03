@@ -49,7 +49,6 @@ from phoenix5 import WPI_VictorSPX
 from commands2 import cmd, RunCommand
 
 from wpilib.shuffleboard import Shuffleboard
-
 from wpilib import SmartDashboard
 
 # 9982 - the intake falls to the front of the robot
@@ -146,17 +145,15 @@ class DriveSubsystem(commands2.Subsystem):
             #self.idk10.getEntry().setFloatArray(self._lime.botPose)
             #fpgatime = RobotController.getFPGATime()
             #self.odometry.addVisionMeasurement(self._lime.seqToPose(self._lime.botPose), self._lime.calcTimestamp(fpgatime), Lc.SKEPTICISM)
-
-        #print(self._lime.totalLatency)
-        self.idk2.getEntry().setInteger(self.leftEncoder.get())
-        self.idk3.getEntry().setInteger(self.rightEncoder.get())
-        self.idk5.getEntry().setFloat(self.odometry.getEstimatedPosition().X())
-        self.idk6.getEntry().setFloat(self.odometry.getEstimatedPosition().Y())
-        self.idk7.getEntry().setFloat(self.odometry.getEstimatedPosition().rotation().degrees())
-        #self.idk9.getEntry().setFloat(self._lime.totalLatency)
-       # self.idk8.getEntry().setInteger(self._lime.priTag)
-        #self.idk10.getEntry().setFloatArray(self._lime.botPose)
-        #self.idk9.getEntry().setString("Hehe")
+        
+        SmartDashboard.putNumberArray("RobotDrive Motors", self.getMotorOutputs())
+        
+    def getMotorOutputs(self):
+        return [
+            self.leftFrontMotor.getMotorOutputVoltage(),
+            self.rightFrontMotor.getMotorOutputVoltage(),
+            self.leftRearMotor.getMotorOutputVoltage(),
+            self.rightRearMotor.getMotorOutputVoltage()]
 
     def arcadeDrive(self, fwd: float, rot: float):
         if self.isRewindTime:
@@ -285,12 +282,12 @@ class DriveSubsystem(commands2.Subsystem):
             .velocity(self.rightEncoder.getRate())
     # === /sysid ===
 
-    def setVoltages(self, left, right):
+    def setVoltages(self, left: float = 0, right: float = 0):
         self.leftMotorGroup.setVoltage(left)
         self.rightMotorGroup.setVoltage(right)
 
     def stopIt(self):
-        return cmd.runOnce(lambda: self.setVoltages(0, 0), self)
+        return cmd.runOnce(lambda: self.setVoltages, self)
 
     def shouldFlipPath() -> bool:
         # Boolean supplier that controls when the path will be mirrored for the red alliance

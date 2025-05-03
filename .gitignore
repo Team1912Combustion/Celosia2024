@@ -1,5 +1,11 @@
-*cpython*
 simgui*
 *logs
-*cache*
+
+# cached bytecode
+*cpython*
+*pycache*
+
 PathWeaver/Autos
+
+# annoying
+*-window.json

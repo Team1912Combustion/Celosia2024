@@ -1,11 +1,12 @@
 from constants import GyroConstants as Gc
-from commands2 import Subsystem
 from wpilib import SmartDashboard
+from commands2 import Subsystem
 from navx import AHRS
 
 class GyroSub(Subsystem):
     def __init__(self):
         self.__g = AHRS.create_spi(Gc.PORT, Gc.BITRATE, Gc.UPDATE_HZ)
+        self.__g.enableLogging(Gc.LOG_TO_CONSOLE)
         self.reset()
 
     def periodic(self):

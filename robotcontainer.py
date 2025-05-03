@@ -1,5 +1,4 @@
 import math
-import numpy
 import commands2
 
 from commands.ramtest import RamTest
@@ -22,6 +21,10 @@ from commands2.button import CommandXboxController
 
 from commands2 import Command, SequentialCommandGroup, WaitCommand, ParallelCommandGroup
 
+from wpilib import SendableChooser, SmartDashboard, DriverStation
+
+from wpilib.event import *
+
 class RobotContainer:
     driverController = CommandXboxController(0)
     opsController = CommandXboxController(1)
@@ -36,6 +39,8 @@ class RobotContainer:
         self.shooter = ShooterSubsystem()
         self.sew = SewSubsystem()
         self.amp = AmpSub().bind(self.opsController)
+
+        DriverStation.silenceJoystickConnectionWarning(True)
 
         CameraServer.launch()
 
@@ -80,12 +85,10 @@ class RobotContainer:
             self.amp.setSpeed(speed))
 
     def getAutonomousCommand(self) -> Command:
-
         return SequentialCommandGroup(
             self.shooter.setSpeed(1.0),
             self.feeder.setSpeed(1.0),
             WaitCommand(6), self.intake.setSpeed(0.5),
-            WaitCommand(1), self.setAll(0.0),
-            RamTest(self.drive, self.sew), self.drive.stopIt())
+            WaitCommand(1), self.setAll(0.0))
 
     #def cleanup(self): self.lime.disconnect()
